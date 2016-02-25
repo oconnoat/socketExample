@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>(In)finite Scrabble</title>
+  </head>
+  <body>
+    <div>
+      <!-- board -->
+      <div id='board' />
+    </div>
+    <div>
+      <ul id="messages"></ul>
+      <form id="messageform" action="">
+        <input id="m" autocomplete="off" /><button>Send</button>
+      </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+            var socket = io();
+            var messageForm = document.getElementById("messageform");
+            messageForm.addEventListener("submit", function(event){
+                var message = messageForm.elements["m"].value;
+                socket.emit('chat message', message);
+                event.preventDefault();
+                document.getElementById("m").value = '';
+            });
+            socket.on('chat message', function(msg){
+                var messagelist = document.getElementById("messages");
+                var msgtext = document.createTextNode(msg);
+                var listItem = document.createElement("li");
+                listItem.appendChild(msgtext);
+                messagelist.appendChild(listItem);
+            });
+            socket.on('board update', function(newboard){
+                var boardDiv = document.getElementById("board");
+                var boardText = document.createTextNode(newboard);
+                var boardParagraph = document.createElement("p");
+                boardParagraph.appendChild(boardText);
+                boardDiv.appendChild(boardParagraph);
+            });
+    </script>
+  </body>
+</html>
